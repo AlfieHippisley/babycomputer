@@ -5,14 +5,42 @@
 // Date Last Modified - 16/11/2018
 
 #include <iostream>
+#include <fstream>
+
 
 using namespace std;
 
 // If this is true, main menu will keep displaying
 bool runProgram = true;
 
+int store[];
+
 // MainMenu() - Purpose :
 // This displays the menu to the user so they can choose an option
+
+void initializeStore() {
+	
+	// We use a 32 bit wide & deep store
+	int bitSize = 32;
+
+	// A 2D array in c is an array of pointers to arrays
+	int** store = new int*[bitSize];
+
+	// We go down the array of pointers creating new arrays of 32 bits
+	for (int i = 0; i < bitSize; ++i) 
+	{
+		store[i] = new int[bitSize];
+	}
+
+	// Fill The Array With 0
+	for (int i = 0; i < bitSize; i++)
+	{
+		for (int i2 = 0; i2 < bitSize; i2++)
+		{
+			store[i][i2] = 0;
+		}
+	}
+}
 
 void mainMenu() {
 	
@@ -20,7 +48,7 @@ void mainMenu() {
 	int userEntry = 0;
 
 	// Display The Menu
-	cout << "Main Menu - Please Choose An Option\n";
+	cout << "\nMain Menu - Please Choose An Option\n";
 	cout << "--------------------------------------------\n";
 	cout << "1 - Run The Default Binary Code\n";
 	cout << "2 - Import Binary Code\n";
@@ -34,7 +62,7 @@ void mainMenu() {
 	{
 		// Case 1 - Run Default Binary Code
 		case 1:
-			cout << "\nYou have choosen option 1\n";
+			initializeStore();
 		break;
 
 		// Case 2 - Import Binary Code
@@ -61,15 +89,6 @@ int main()
 	while (runProgram) {
 		mainMenu();
 	}
+
+	return 0;
 }
-
-// Run program: Ctrl + F5 or Debug > Start Without Debugging menu
-// Debug program: F5 or Debug > Start Debugging menu
-
-// Tips for Getting Started: 
-//   1. Use the Solution Explorer window to add/manage files
-//   2. Use the Team Explorer window to connect to source control
-//   3. Use the Output window to see build output and other messages
-//   4. Use the Error List window to view errors
-//   5. Go to Project > Add New Item to create new code files, or Project > Add Existing Item to add existing code files to the project
-//   6. In the future, to open this project again, go to File > Open > Project and select the .sln file
