@@ -2,7 +2,7 @@
 // Written By - Alfie Hippisley, Archie Rutherford
 
 // Date Created - 16/11/2018
-// Date Last Modified - 16/11/2018
+// Date Last Modified - 17/11/2018
 
 #include <iostream>
 #include <fstream>
@@ -17,8 +17,17 @@ bool runProgram = true;
 // We use a 32 bit wide & deep store
 int bitSize = 32;
 
-// A 2D array in c is an array of pointers to arrays
+// A 2D array in C++ is an array of pointers to arrays
 int** store = new int*[bitSize];
+
+// The Control Instruction - stores the current line.
+int CI = 0;
+
+// Present instruction - The instruction currently being accessed.
+int* PI = new int[bitSize];
+
+// The accumulator holds number while they are being calculated.
+int accumulator = 0;
 
 // initializeStore() - Purpose :
 // This will create a 2d array that will act as the store
@@ -27,7 +36,7 @@ int** store = new int*[bitSize];
 void initializeStore() {
 
 	// We go down the array of pointers creating new arrays of 32 bits
-	for (int i = 0; i < bitSize; ++i) 
+	for (int i = 0; i < bitSize; ++i)
 	{
 		store[i] = new int[bitSize];
 	}
@@ -54,7 +63,7 @@ void fillStore() {
 	// This is the file link
 	ifstream myfile("BabyTest1-MC.txt");
 
-	// This keeps count of what line we are on	 
+	// This keeps count of what line we are on
 	int counter = 0;
 
 	// If the file has been found and is open
@@ -63,7 +72,7 @@ void fillStore() {
 		while (getline(myfile, line)) // While there are still lines in the file
 		{
 			for (int i = 0; i < bitSize; i++) // For each index in the string up to defined bitsize eg 32 (String is array of char)
-			{	
+			{
 				char lineChar = line[i]; // The file reads in as Strings, if we use them we would end up storing ascii values
 				store[counter][i] = lineChar -'0'; // So we convert the ascii to ints for storage and processing
 			}
@@ -91,10 +100,90 @@ void fillStore() {
 	}
 }
 
+// accumulator() - Purpose :
+// The accumulator will process all of the opcode
+// and operands taken from the store.
+void accumulator() {
+
+	// Increment Control Instruction
+	CI++;
+
+	// Fetch
+	for (int i=0; i<bitSize; i++) {
+		PI[i] = store[CI][i];
+	}
+
+	// Decode
+ 	// #### #000 0000 0### 0000 0000 0000 0000
+	// 0123 4567 8901 2345 6789 0123 4567 8901
+	int opcode  = 0;
+	int operand = 0;
+
+	if (store[CI][13] == 1) { opcode += 4; }
+	if (store[CI][14] == 1) { opcode += 2; }
+	if (store[CI][15] == 1) { opcode += 1; }
+
+	if (store[CI][0] == 1) { opcode += 16; }
+	if (store[CI][1] == 1) { opcode += 8;  }
+	if (store[CI][2] == 1) { opcode += 4;  }
+	if (store[CI][3] == 1) { opcode += 2;  }
+	if (store[CI][4] == 1) { opcode += 1;  }
+
+	// Execute
+	bool stop = false;
+
+	switch (opcode)
+	{
+		case 0:
+			// JMP
+			CI = operand;
+		break;
+
+		case 1:
+			// JRP
+			CI = CI + operand;
+		break;
+
+		case 2:
+			// LND
+			accumulator = -operand;
+		break;
+
+		case 3:
+			// STO
+			operand = accumulator;
+		break;
+
+		case 4:
+		case 5:
+			// SUB
+			accumulator = accumulator + operand;
+		break;
+
+		case 6:
+			// CMP
+			if (accumulator < 0) { CI++; }
+		break;
+
+		case 7:
+			// STP
+			stop = true;
+		break;
+	}
+
+	// Display
+	
+
+	// Check if Halted
+	if (stop) { return 0; }
+
+	return 1;
+}
+
 // mainMenu() - Purpose :
 // This displays the user menu and takes their inputs
 void mainMenu() {
-	
+
 	// Create Int To Store User Input
 	int userEntry = 0;
 
@@ -125,7 +214,7 @@ void mainMenu() {
 		// Case 0 - Exit Program
 		case 3:
 			cout << "\nYou Are Now Exiting The Program - Good Bye!\n";
-			exit (0);
+			runProgram = false;
 		break;
 
 		// Default - For Invalid Input
