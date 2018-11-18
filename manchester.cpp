@@ -60,8 +60,16 @@ void fillStore() {
 	// This will store the lines as they come in
 	string line;
 
-	// This is the file link
-	ifstream myfile("BabyTest1-MC.txt");
+	// This will store the name of the file to be read
+	string fileName;
+
+	// Ask the user for a filename
+	cout << "\nEnter the filename : ";
+	cin  >> fileName;
+	cout << "\n";
+
+	// This will open the selected file
+	ifstream myfile(fileName);
 
 	// This keeps count of what line we are on
 	int counter = 0;
@@ -87,17 +95,6 @@ void fillStore() {
 
 	// If we cant find the file display this error message
 	else cout << "Unable to open file";
-
-	// Print the values in the array (Debugging only, remove before submission)
-	for (int i = 0; i < bitSize; i++)
-	{
-		cout << endl << i << " Line Is - " << endl;
-
-		for (int i2 = 0; i2 < bitSize; i2++)
-		{
-			cout << store[i][i2];
-		}
-	}
 }
 
 // accumulator() - Purpose :
@@ -111,12 +108,12 @@ int accumulator() {
 	}
 
 	// Decode
- 	// #### #000 0000 0### 0000 0000 0000 0000
-	// 0123 4567 8901 2345 6789 0123 4567 8901
 	int opcode  = 0;
 	int operand = 0;
 	string operation;
 
+	// Translate the opcode and operand from binary to integer
+ 	// #### #000 0000 0### 0000 0000 0000 0000
 	if (store[CI][13] == 1) { opcode += 4; }
 	if (store[CI][14] == 1) { opcode += 2; }
 	if (store[CI][15] == 1) { opcode += 1; }
@@ -177,9 +174,9 @@ int accumulator() {
 	}
 
 	// Display
-	cout << "\nControl Instruction : " << CI;
 	cout << "\nPresent Instruction : ";
 	for (int i=0; i<bitSize; i++) { cout << PI[i]; }
+	cout << "\nControl Instruction : " << CI;
 	cout << "\nOperation           : " << operation;
 	if (operand != 0) { cout << "\nOperand             : " << operand; }
 	cout << "\nAccumulator         : " << AC;
@@ -205,8 +202,7 @@ void mainMenu() {
 	cout << "\nMain Menu - Please Choose An Option\n";
 	cout << "--------------------------------------------\n";
 	cout << "1 - Run The Default Binary Code\n";
-	cout << "2 - Import Binary Code\n";
-	cout << "3 - Exit Program\n";
+	cout << "0 - Exit Program\n";
 
 	// Get User Input
 	cin >> userEntry;
@@ -214,7 +210,7 @@ void mainMenu() {
 	// Process User Input
 	switch (userEntry)
 	{
-		// Case 1 - Run Default Binary Code
+		// Case 1 - Run Binary Code
 		case 1:
 			initializeStore();
 			fillStore();
@@ -222,13 +218,8 @@ void mainMenu() {
 
 		break;
 
-		// Case 2 - Import Binary Code
-		case 2:
-			cout << "\nYou have choosen option 2\n";
-		break;
-
 		// Case 0 - Exit Program
-		case 3:
+		case 0:
 			cout << "\nYou Are Now Exiting The Program - Good Bye!\n";
 			runProgram = false;
 		break;
