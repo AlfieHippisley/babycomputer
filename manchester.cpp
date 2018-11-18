@@ -26,8 +26,8 @@ int CI = 0;
 // Present instruction - The instruction currently being accessed.
 int* PI = new int[bitSize];
 
-// The accumulator holds number while they are being calculated.
-int accumulator = 0;
+// The Accumulator - holds number while they are being calculated.
+int AC = 0;
 
 // initializeStore() - Purpose :
 // This will create a 2d array that will act as the store
@@ -103,10 +103,7 @@ void fillStore() {
 // accumulator() - Purpose :
 // The accumulator will process all of the opcode
 // and operands taken from the store.
-void accumulator() {
-
-	// Increment Control Instruction
-	CI++;
+int accumulator() {
 
 	// Fetch
 	for (int i=0; i<bitSize; i++) {
@@ -118,16 +115,17 @@ void accumulator() {
 	// 0123 4567 8901 2345 6789 0123 4567 8901
 	int opcode  = 0;
 	int operand = 0;
+	string operation;
 
 	if (store[CI][13] == 1) { opcode += 4; }
 	if (store[CI][14] == 1) { opcode += 2; }
 	if (store[CI][15] == 1) { opcode += 1; }
 
-	if (store[CI][0] == 1) { opcode += 16; }
-	if (store[CI][1] == 1) { opcode += 8;  }
-	if (store[CI][2] == 1) { opcode += 4;  }
-	if (store[CI][3] == 1) { opcode += 2;  }
-	if (store[CI][4] == 1) { opcode += 1;  }
+	if (store[CI][0] == 1) { operand += 16; }
+	if (store[CI][1] == 1) { operand += 8;  }
+	if (store[CI][2] == 1) { operand += 4;  }
+	if (store[CI][3] == 1) { operand += 2;  }
+	if (store[CI][4] == 1) { operand += 1;  }
 
 	// Execute
 	bool stop = false;
@@ -137,45 +135,61 @@ void accumulator() {
 		case 0:
 			// JMP
 			CI = operand;
-		break;
+			operation = "JMP";
+			break;
 
 		case 1:
 			// JRP
 			CI = CI + operand;
-		break;
+			operation = "JRP";
+			break;
 
 		case 2:
 			// LND
-			accumulator = -operand;
-		break;
+			AC = -operand;
+			operation = "LND";
+			break;
 
 		case 3:
 			// STO
-			operand = accumulator;
-		break;
+			operand = AC;
+			operation = "STO";
+			break;
 
 		case 4:
 		case 5:
 			// SUB
-			accumulator = accumulator + operand;
-		break;
+			AC = AC + operand;
+			operation = "SUB";
+			break;
 
 		case 6:
 			// CMP
-			if (accumulator < 0) { CI++; }
-		break;
+			if (AC < 0) { CI++; }
+			operation = "CMP";
+			break;
 
 		case 7:
 			// STP
 			stop = true;
-		break;
+			operation = "STP";
+			break;
 	}
 
 	// Display
-	
+	cout << "\nControl Instruction : " << CI;
+	cout << "\nPresent Instruction : ";
+	for (int i=0; i<bitSize; i++) { cout << PI[i]; }
+	cout << "\nOperation           : " << operation;
+	if (operand != 0) { cout << "\nOperand             : " << operand; }
+	cout << "\nAccumulator         : " << AC;
+	cout << endl;
+
+	// Increment Control Instruction
+	CI++;
 
 	// Check if Halted
-	if (stop) { return 0; }
+	if (stop || CI == 31) { return 0; }
 
 	return 1;
 }
@@ -204,6 +218,8 @@ void mainMenu() {
 		case 1:
 			initializeStore();
 			fillStore();
+			while (accumulator() == 1) {}
+
 		break;
 
 		// Case 2 - Import Binary Code
