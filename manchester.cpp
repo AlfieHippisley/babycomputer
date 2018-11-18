@@ -55,7 +55,7 @@ void initializeStore() {
 // Fill the store with predefined binary code from a file
 // Note For Me - University Of Wollongong used for reference
 
-void fillStore() {
+int fillStore() {
 
 	// This will store the lines as they come in
 	string line;
@@ -94,7 +94,9 @@ void fillStore() {
 	}
 
 	// If we cant find the file display this error message
-	else cout << "Unable to open file";
+	else return 1;
+
+	return 0;
 }
 
 // accumulator() - Purpose :
@@ -213,9 +215,10 @@ void mainMenu() {
 		// Case 1 - Run Binary Code
 		case 1:
 			initializeStore();
-			fillStore();
-			while (accumulator() == 1) {}
-
+			if (fillStore() == 0) {
+				while (accumulator() == 1) {}
+			}
+			else cout << "Unable to open file\n";
 		break;
 
 		// Case 0 - Exit Program
