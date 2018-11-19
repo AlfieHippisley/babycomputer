@@ -1,13 +1,14 @@
 #ifndef __ASSEMBLER_H__
 #define __ASSEMBLER_H__
 
+#include <bitset>
 #include <cstdint>
-#include <array>
 #include <vector>
 #include <string>
 
 using namespace std;
 
+// Defines the exceptions that can be thrown during the assembly process.
 enum AssemblerError {
   INSTRUCTION_NOT_FOUND,  // Invalid opcode
   UNEXPECTED_NUMERIC,     // Found numerical value where non-numerical value was expected
@@ -18,9 +19,12 @@ enum AssemblerError {
   DUPLICATE_LABEL         // One symbol defined multiple times
 };
 
+
 class BabyAssembler {
 
 protected:
+  string errVal; // the token at which the most recent AssemblerError occurred
+
   vector<string> readAssemblyFile(string fileName);
   uint8_t getInstruction(string instruction);
 
@@ -35,7 +39,7 @@ protected:
   bool isWordDelimiter(char c) { return (isspace(c) || c == ';' || c == ':'); }
 
 public:
-  uint8_t errX, errY; // the row and column at which the most recent AssemberError occurred
+  string getErrVal() { return errVal; }
 
   bitset<32> babyBinary(uint32_t n); // converts n to a reversed bitset
 
